@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
-import sys
 import os
 import tweepy
-import init_contract
+import json
+import requests
 
 class AuthHandler:
     def authenticate_twitter_app(self):
@@ -14,9 +14,7 @@ class AuthHandler:
 class MyStreamListener(tweepy.StreamListener):
 
     def tokenizeAsset(self, data):
-        #function responsible for making call to tezos contract
-        # uploadTweeet=init_contract.tweet_contract()
-        # uploadTweeet.tokenize(data,"Random")
+        
         pass
        
 
