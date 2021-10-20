@@ -14,9 +14,16 @@ class AuthHandler:
 class MyStreamListener(tweepy.StreamListener):
 
     def tokenizeAsset(self, data):
-        
-        pass
-       
+        print("Tokenizing tweet")
+        payload={"address":"tz1dtPTfhgLLHQfDmQXyoT4WMAEHJiTCHPoU","tweet":data}
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        r=requests.post("http://localhost:1234",data=json.dumps(payload),headers=headers)
+        response=r.json()
+        if(response["success"]):
+            print("Successfully tokenized with transaction hash ",response["message"])
+        else:
+            print("Error while tokenizing")
+            print(response["message"])
 
     def on_status(self, status):
         if(status.is_quote_status):
