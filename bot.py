@@ -11,7 +11,7 @@ class AuthHandler:
         api=tweepy.API(auth)
         return api
 
-class MyStreamListener(tweepy.StreamListener):
+class MyStreamListener(tweepy.StreamListener,AuthHandler):
 
     def tokenizeAsset(self, hashtags,tweet,tweetId):
         print("Tokenizing tweet")
@@ -24,7 +24,6 @@ class MyStreamListener(tweepy.StreamListener):
         else:
             print("Error while tokenizing")
             print(response["message"])
-        pass
 
     def on_status(self, status):
         addressList=[]
@@ -33,10 +32,13 @@ class MyStreamListener(tweepy.StreamListener):
         for i in hashtags:
             addressList.append(i['text'])
 
-        if(status.is_quote_status):
-            print("Tokenizing tweet of user...",status.quoted_status.user.name)
+        if(status.in_reply_to_status_id_str):
+            orig_tweetId=status.in_reply_to_status_id_str
+            print("Tokenizing tweet of user...",status.user.name)
             print("-------------------------")
-            self.tokenizeAsset(addressList,status.quoted_status.text,status.id_str)
+            api=AuthHandler.authenticate_twitter_app(self)
+            tweet=api.get_status(int(orig_tweetId))
+            self.tokenizeAsset(addressList,tweet.text,orig_tweetId)
         else:
             print("Tokenizing a new tweet of user....",status.user.name)
             print("-------------------------")
