@@ -13,9 +13,9 @@ class AuthHandler:
 
 class MyStreamListener(tweepy.StreamListener):
 
-    def tokenizeAsset(self, data):
+    def tokenizeAsset(self, hashtags,tweet,tweetId):
         print("Tokenizing tweet")
-        payload={"address":"tz1dtPTfhgLLHQfDmQXyoT4WMAEHJiTCHPoU","tweet":data}
+        payload={"address":hashtags,"tweet":tweet,"tweetId":tweetId}
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         r=requests.post("http://localhost:1234",data=json.dumps(payload),headers=headers)
         response=r.json()
@@ -24,18 +24,23 @@ class MyStreamListener(tweepy.StreamListener):
         else:
             print("Error while tokenizing")
             print(response["message"])
+        pass
 
     def on_status(self, status):
+        addressList=[]
+        hashtags=status.entities["hashtags"]
+
+        for i in hashtags:
+            addressList.append(i['text'])
+
         if(status.is_quote_status):
             print("Tokenizing tweet of user...",status.quoted_status.user.name)
-            print("Tweet data is....",status.quoted_status.text)
             print("-------------------------")
-            self.tokenizeAsset(status.quoted_status.text)
+            self.tokenizeAsset(addressList,status.quoted_status.text,status.id_str)
         else:
             print("Tokenizing a new tweet of user....",status.user.name)
-            print("Tweet data is....",status.text)
             print("-------------------------")
-            self.tokenizeAsset(status.text)
+            self.tokenizeAsset(addressList,status.text,status.id_str)
     
     def on_error(self, status_code):
         print(status_code)
